@@ -8,9 +8,21 @@
   "engines": {
     "node": ">=12.0.0"
   },
+  "scripts": {
+    "demo": "ts-node ./src/cli.ts",
+    "clean": "rm -rf ./dist",
+    "build": "npm run clean && tsc && npm link @grouparoo/demo"
+  },
+  "bin": {
+    "demo": "./dist/cli.js"
+  },
   "dependencies": {
-    "prettier": "^2.0.2",
     "yargs": "^15.3.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/yargs": "^15.0.5",
+    "prettier": "^2.0.2",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.5"
+  }
 }
