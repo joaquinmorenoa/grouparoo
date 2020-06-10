@@ -79,6 +79,7 @@ class Connection {
   }
   async createCsvTable(
     tableName: string,
+    userId: string,
     types: any,
     createdAt: boolean,
     updatedAt: boolean
@@ -115,8 +116,15 @@ class Connection {
     const variables = typeKeys.map((key, index) => "$" + (index + 1));
     const insertQuery = `INSERT INTO ${tableName} (${columnNames}) VALUES (${variables})`;
     for (const row of rows) {
-      // in last 3 months
-      const creationAgo = 60 * 60 * 24 * 30 * Math.random() * 1000;
+      // 100 people in last 3 months, spaced out
+      const numberOfUsers = 1000;
+      const secondsBack = 60 * 60 * 24 * 30 * 3;
+      const secondsEach = secondsBack / 1000; // for each user
+      const ageNumber = numberOfUsers - parseInt(row[userId]);
+      let creationAgo = secondsEach * ageNumber * 1000;
+      if (tableName !== "users") {
+        creationAgo = Math.random() * creationAgo;
+      }
       const now = new Date().getTime();
       const creationMilli = now - creationAgo;
       if (createdAt) {
@@ -149,7 +157,7 @@ class Connection {
       deactivated: "BOOLEAN",
     };
 
-    await this.createCsvTable("users", types, true, true);
+    await this.createCsvTable("users", "id", types, true, true);
   }
 
   async purchases() {
@@ -162,7 +170,7 @@ class Connection {
       state: "VARCHAR(191)",
     };
 
-    await this.createCsvTable("purchases", types, true, false);
+    await this.createCsvTable("purchases", "user_id", types, true, false);
   }
 }
 
