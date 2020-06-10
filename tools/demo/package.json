@@ -10,6 +10,7 @@
   },
   "scripts": {
     "demo": "ts-node ./src/cli.ts",
+    "dev": "ts-node ./src/cli.ts -vvvvvv",
     "clean": "rm -rf ./dist",
     "build": "npm run clean && tsc && npm link @grouparoo/demo"
   },
@@ -17,6 +18,10 @@
     "demo": "./dist/cli.js"
   },
   "dependencies": {
+    "csv-parse": "^4.10.1",
+    "dotenv": "^8.2.0",
+    "fs-extra": "^9.0.1",
+    "pg": "^8.2.1",
     "yargs": "^15.3.1"
   },
   "devDependencies": {
