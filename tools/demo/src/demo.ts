@@ -1,5 +1,5 @@
-import postgres from "./postgres";
+import sample_data from "./sample_data";
 export const cmd = async function (vargs) {
-  console.log("here", vargs.verbose);
-  await postgres(vargs);
+  console.log("Running with verbose:", vargs.verbose);
+  await sample_data(vargs);
 };

@@ -1,20 +1,16 @@
 import { Client } from "pg";
-import { log, readEnv, execSync, sleep } from "./shared";
+import { log, execSync, sleep } from "./shared";
 import parse from "csv-parse/lib/sync";
 import fs from "fs";
 import path from "path";
 
-export default async function (vargs) {
-  log(vargs, 0, "Running Postgres");
-  const connection = new Connection(vargs);
-  await connection.setup();
-}
-
-class Connection {
+export default class Postgres {
   client: Client;
   vargs: any;
-  constructor(vargs) {
+  connectionString: string;
+  constructor(vargs, connectionString) {
     this.vargs = vargs;
+    this.connectionString = connectionString;
     this.client = null;
   }
 
@@ -27,13 +23,15 @@ class Connection {
   }
 
   makeClient() {
-    const env = readEnv();
-    const connectionString = env.POSTGRES_DEMO_URL;
-
-    this.log(1, "POSTGRES_DEMO_URL:", connectionString);
-    return new Client({ connectionString });
+    return new Client({ connectionString: this.connectionString });
   }
 
+  async disconnect() {
+    if (this.client) {
+      this.client.end();
+      this.client = null;
+    }
+  }
   async connect() {
     if (this.client) {
       return this.client;
@@ -52,12 +50,6 @@ class Connection {
     }
     this.client = client;
     return this.client;
-  }
-
-  async setup() {
-    await this.connect();
-    await this.users();
-    await this.purchases();
   }
 
   async createDb() {
@@ -142,35 +134,6 @@ class Connection {
       );
       await this.query(2, insertQuery, values);
     }
-  }
-
-  async users() {
-    const types = {
-      id: "INT NOT NULL PRIMARY KEY",
-      first_name: "VARCHAR(191) NOT NULL",
-      last_name: "VARCHAR(191) NOT NULL",
-      email: "VARCHAR(191) NOT NULL",
-      gender: "VARCHAR(191)",
-      ip_address: "VARCHAR(191)",
-      avatar: "VARCHAR(191)",
-      language: "VARCHAR(191)",
-      deactivated: "BOOLEAN",
-    };
-
-    await this.createCsvTable("users", "id", types, true, true);
-  }
-
-  async purchases() {
-    const types = {
-      id: "INT NOT NULL PRIMARY KEY",
-      user_id: "INT NOT NULL",
-      item: "VARCHAR(191) NOT NULL",
-      category: "VARCHAR(191) NOT NULL",
-      price: "DECIMAL",
-      state: "VARCHAR(191)",
-    };
-
-    await this.createCsvTable("purchases", "user_id", types, true, false);
   }
 }
 
